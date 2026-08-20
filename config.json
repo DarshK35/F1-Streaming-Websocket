@@ -1,0 +1,21 @@
+{
+  "mongo": {
+    "connection-str": "mongodb://localhost:27017",
+    "db-name": "openf1-livetiming",
+    "schemas": {
+      "car-location": "location",
+      "car-telemetry": "car_data",
+      "race-control": "race_control",
+      "meetings": "meetings",
+      "sessions": "sessions",
+      "drivers": "drivers"
+    }
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8000
+  },
+  "replay": {
+    "tick-rate": 20.0
+  }
+}
