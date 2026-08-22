@@ -70,16 +70,8 @@ async def loadDrivers(db, sessionKey: int) -> list[dict]:
 
 
 # ########################################
-# Playback simulations
+# Playback simulation
 # ########################################
-# TODO: Implement Live race watch
-async def watchLive(
-    db: AsyncIOMotorDatabase, ws: websockets.WebSocketServerProtocol, sessionKey: int
-) -> None:
-    INTERVAL = 1 / configMod.config["replay"]["tick-rate"]
-    print(INTERVAL)
-
-
 async def runReplay(
     db: AsyncIOMotorDatabase,
     ws: websockets.WebSocketServerProtocol,

@@ -5,7 +5,7 @@ import logging
 import websockets
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from util.app import getDb, loadDrivers, runReplay, watchLive
+from util.app import getDb, loadDrivers, runReplay
 from model.packets import makeDriversPacket, makeErrorPacket, makeStatusPacket
 from model.replay import StreamHandle, ReplayControl
 
@@ -75,10 +75,7 @@ async def handleClient(
                         makeStatusPacket("starting", mode=req["mode"], session_key=sessionKey)
                     )
 
-                    if req["mode"] == "replay":
-                        coro = runReplay(db, ws, sessionKey, handle=stream)
-                    else:
-                        coro = watchLive(db, ws, sessionKey)
+                    coro = runReplay(db, ws, sessionKey, handle=stream)
                     replayControl = ReplayControl(speed = req["speed"])
 
                     stream.task = asyncio.create_task(coro)
