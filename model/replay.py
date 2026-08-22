@@ -20,6 +20,9 @@ class ReplayControl:
         self.tick()
         self.speed = speed
 
+    def resetClock(self) -> None:
+        self._lastRealTime = time.monotonic()
+
     @property
     def paused(self) -> bool:
         return self.speed == 0.0

@@ -87,9 +87,12 @@ async def handleClient(
             elif msgType == "control":
                 log.info(f"Remote {remote} requested speed update to {msg.get("speed")}")
 
-                if stream.task is None:
+                if stream.task is None or stream.task.done():
                     await ws.send(makeErrorPacket("No stream running"))
                     continue
+
+                if stream.control is None:
+                    await ws.send(makeErrorPacket("Stream has no control handle"))
 
                 if not stream.task.done() and stream.control is not None:
                     stream.control.setSpeed(msg.get("speed"))

@@ -153,6 +153,7 @@ async def runReplay(
 
     simStart: float = await getEarliestTimestamp()
     handle.control.simStart = simStart
+    handle.control.resetClock()
 
     await asyncio.gather(
         *(readBuffer(schema) for schema in STREAM_SCHEMAS), streamBuffers(handle.control)
