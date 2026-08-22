@@ -1,6 +1,8 @@
 import json
 
-# Response Packets
+# ########################################
+# General Data Packets
+# ########################################
 def makeDriversPacket(drivers: list[dict]) -> str:
     return json.dumps(
         {
@@ -17,6 +19,10 @@ def makeDriversPacket(drivers: list[dict]) -> str:
         }
     )
 
+
+# ########################################
+# Replay Packets
+# ########################################
 def makeCarStatusPacket(carStatus: dict[int, dict]) -> str:
     return json.dumps(
         {
@@ -45,6 +51,10 @@ def makeRaceControlPacket(events: list[dict]) -> str:
         }
     )
 
+
+# ########################################
+# Miscellaneous Packets
+# ########################################
 def makeStatusPacket(state: str, **extra) -> str:
     return json.dumps({"type": "status", "state": state, **extra})
 
