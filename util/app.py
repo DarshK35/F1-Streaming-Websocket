@@ -84,8 +84,7 @@ async def runReplay(
     db: AsyncIOMotorDatabase,
     ws: websockets.WebSocketServerProtocol,
     sessionKey: int,
-    speed: float,
-    handle: StreamHandle | None,
+    handle: StreamHandle,
 ) -> None:
     collectors = {
         key: db[configMod.config["mongo"]["schemas"][key]] for key in STREAM_SCHEMAS
@@ -94,7 +93,8 @@ async def runReplay(
         key: collectors[key].find({"session_key": sessionKey}) for key in STREAM_SCHEMAS
     }
 
-    log.info(f"Replaying session {sessionKey} at {speed}x speed")
+    assert handle.control is not None
+    log.info(f"Replaying session {sessionKey} at {handle.control.speed}x speed")
     INTERVAL = 1 / configMod.config["replay"]["tick-rate"]
 
     buffers = {key: deque() for key in STREAM_SCHEMAS}
@@ -160,11 +160,8 @@ async def runReplay(
                 return
 
     simStart: float = await getEarliestTimestamp()
-    control = ReplayControl(simStart=simStart, speed=speed)
-
-    if handle is not None:
-        handle.control = control
+    handle.control.simStart = simStart
 
     await asyncio.gather(
-        *(readBuffer(schema) for schema in STREAM_SCHEMAS), streamBuffers(control)
+        *(readBuffer(schema) for schema in STREAM_SCHEMAS), streamBuffers(handle.control)
     )

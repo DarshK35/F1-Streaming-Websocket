@@ -7,7 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from util.app import getDb, loadDrivers, runReplay, watchLive
 from model.packets import makeDriversPacket, makeErrorPacket, makeStatusPacket
-from model.replay import StreamHandle
+from model.replay import StreamHandle, ReplayControl
 
 log = logging.getLogger(__name__)
 
@@ -76,14 +76,27 @@ async def handleClient(
                     )
 
                     if req["mode"] == "replay":
-                        coro = runReplay(db, ws, sessionKey, speed=req["speed"], handle=stream)
+                        coro = runReplay(db, ws, sessionKey, handle=stream)
                     else:
                         coro = watchLive(db, ws, sessionKey)
+                    replayControl = ReplayControl(speed = req["speed"])
 
                     stream.task = asyncio.create_task(coro)
+                    stream.control = replayControl
                 except Exception as e:
                     log.warning(f"Failed to start stream for {remote}: {e}")
                     await ws.send(makeErrorPacket(f"start failed: {e}"))
+                    
+            elif msgType == "control":
+                log.info(f"Remote {remote} requested speed update to {msg.get("speed")}")
+
+                if stream.task is None:
+                    await ws.send(makeErrorPacket("No stream running"))
+                    continue
+
+                if not stream.task.done() and stream.control is not None:
+                    stream.control.setSpeed(msg.get("speed"))
+                    await ws.send(makeStatusPacket(f"Stream speed updated to {msg.get("speed")}"))
             else:
                 log.warning(f"Unknown packet type from {remote}: {msgType}")
 

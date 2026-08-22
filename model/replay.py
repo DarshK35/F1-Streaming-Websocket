@@ -4,7 +4,7 @@ import dataclasses
 
 @dataclasses.dataclass
 class ReplayControl:
-    simStart: float
+    simStart: float = 0
     speed: float = 1
     _simElapsed: float = 0
     _lastRealTime: float = dataclasses.field(default_factory=time.monotonic)
